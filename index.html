@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Black and White Pong</title>
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            display: block;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <img id="y4" width="20" height="20" src="y4.png"> -->
+
+    <canvas id="canvas"></canvas>
+    <script>
+        // Get canvas and context
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Set canvas dimensions
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Set game variables
+        const paddleHeight = 260;
+        const paddleWidth = 40;
+        const paddleMargin = 22;
+        const ballRadius = 25;
+        let bounces = 0;
+        const img = document.getElementById("y4");
+
+        // Set initial ball position and velocity
+        let ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            dx: 35,
+            dy: 37,
+            radius: ballRadius,
+        };
+
+        // Set initial paddle position
+        let paddle = {
+            x: paddleMargin,
+            y: canvas.height / 2 - paddleHeight / 2,
+            width: paddleWidth,
+            height: paddleHeight,
+        };
+
+        // Draw ball
+        function drawBall() {
+            ctx.beginPath();
+            //ctx.fillRect(ball.x, ball.y, 30, 30)
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = "white";
+            ctx.fill();
+
+
+            ctx.closePath();
+        }
+
+        // Draw paddle
+        function drawPaddle() {
+            ctx.fillStyle = "white";
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        }
+
+        // Move paddle with mouse
+        canvas.addEventListener("mousemove", function (e) {
+            let mouseY = e.clientY - canvas.offsetTop;
+            if (mouseY > canvas.height - paddle.height) {
+                mouseY = canvas.height - paddle.height;
+            }
+            paddle.y = mouseY;
+        });
+
+        // Restart game on mouse up
+        canvas.addEventListener("mouseup", function (e) {
+            if (e.button === 0) {
+                restartGame();
+            }
+        });
+
+        // Restart game function
+        function restartGame() {
+            // Reset ball position and velocity
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.dx = 33;
+            ball.dy = 33;
+
+            // Reset bounce counter
+            bounces = 0;
+
+            // Start game loop
+            clearInterval(game);
+            game = setInterval(gameLoop, 10);
+        }
+
+        // Game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw ball and paddle
+            drawBall();
+            drawPaddle();
+
+            // Bounce ball off walls and paddle
+            if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+                ball.dy = -ball.dy;
+            }
+            if (ball.x + ball.radius > paddle.x && ball.x - ball.radius < paddle.x && ball.y + ball.radius > paddle.y && ball.y - ball.radius < paddle.y + paddle.height) {
+                ball.dx = -ball.dx;
+                bounces++;
+            }
+            if (ball.x - ball.radius < 0) {
+                // End game
+                clearInterval(game);
+            }
+            if (ball.x + ball.radius > canvas.width) {
+                ball.dx = -ball.dx;
+            }
+
+            // Update ball position
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Draw bounce counter
+            ctx.font = "100px Silkscreen, monospace";
+            ctx.fillStyle = "white";
+            ctx.fillText(bounces, canvas.width - 200, 100);
+        }
+
+        // Start game loop
+        let game = setInterval(gameLoop, 5);
+
+
+
+    </script>
+</body>
+
+</html>
